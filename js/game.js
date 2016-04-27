@@ -26,12 +26,23 @@ game.States.preload = function(){
     	game.load.spritesheet('fox','assets/fox.png',35,39,2); //狐狸
     	game.load.image('btn','assets/start-button.png');  //按钮
     	game.load.spritesheet('pipe','assets/pipes.png',54,320,2); //管道
+    	game.load.spritesheet('topPipe_sprite', 'assets/topPipe.png' ,54 , 320, 19);//顶部管道
+    	game.load.spritesheet('bottomPipe_sprite', 'assets/bottomPipe.png' ,54 ,320 ,19);//底部管道
     	game.load.bitmapFont('flappy_font', 'assets/fonts/flappyfont/flappyfont.png', 'assets/fonts/flappyfont/flappyfont.fnt');
     	game.load.audio('fly_sound', 'assets/flap.wav');//飞翔的音效
     	game.load.audio('score_sound', 'assets/score.wav');//得分的音效
     	game.load.audio('hit_pipe_sound', 'assets/pipe-hit.wav'); //撞击管道的音效
     	game.load.audio('hit_ground_sound', 'assets/ouch.wav'); //撞击地面的音效
-    	game.load.spritesheet('medals','assets/medals.png',44,44,2);//英超成就奖章
+    	game.load.audio('game_over_sound', 'assets/gameover.wav');//游戏结束音效
+    	//游戏结束成就展示
+    	game.load.spritesheet('medals','assets/medals.png',119 ,119 ,2);//英超成就奖章
+    	game.load.spritesheet('arsenal', 'assets/4rsenal.png', 161, 89, 1);//装枪作4
+    	game.load.spritesheet('middle', 'assets/middle.png',148, 34, 3);//中游
+    	game.load.spritesheet('stayLevel', 'assets/stay.png', 161, 40, 3);//保级
+    	game.load.spritesheet('degrade','assets/degrade.png', 172, 45, 1);//降级
+    	game.load.spritesheet('LightPraticle', 'assets/light.png',10, 10);//黄色粒子效果
+
+
 
     	game.load.image('ready_text','assets/get-ready.png');
     	game.load.image('play_tip','assets/instructions.png');
@@ -67,6 +78,7 @@ game.States.play = function(){
 		this.bg = game.add.tileSprite(0,0,game.width,game.height,'background');//背景图
 		this.pipeGroup = game.add.group();
 		this.pipeGroup.enableBody = true;
+		this.pipeTag = 0; //管道标签
 		this.ground = game.add.tileSprite(0,game.height-112,game.width,112,'ground'); //地板
 		this.fox = game.add.sprite(50,150,'fox'); //狐狸
 		this.fox.animations.add('fly');
@@ -81,6 +93,7 @@ game.States.play = function(){
 		this.soundScore = game.add.sound('score_sound');
 		this.soundHitPipe = game.add.sound('hit_pipe_sound');
 		this.soundHitGround = game.add.sound('hit_ground_sound');
+		this.soundGameOver = game.add.sound('game_over_sound')
 		this.scoreText = game.add.bitmapText(game.world.centerX-20, 30, 'flappy_font', '0', 36);
 
 		this.readyText = game.add.image(game.width/2, 40, 'ready_text'); //get ready 文字
@@ -148,7 +161,18 @@ game.States.play = function(){
 		this.gameIsOver = true;
 		this.stopGame();
 		if(show_text) this.showGameOverText();
+		this.soundGameOver.play();
 	};
+
+	/*
+	this.showLightPraticle = function(){ 	//黄色发散粒子动画
+		var emitter = game.add.emitter(game.world.centerX, game.world.centerY, 250);
+		emitter.makeParticles('LightPraticle', [0, 1, 2, 3, 4, 5]);
+		emitter.minParticleSpeed.setTo(-200, -200);
+		emitter.maxParticleSpeed.setTo(200, 200);
+		emitter.gravity = 0;
+		emitter.start(false, 4000, 15);
+	}*/
 
 	this.showGameOverText = function(){
 		this.scoreText.destroy();
@@ -157,21 +181,41 @@ game.States.play = function(){
 		this.gameOverGroup = game.add.group(); //添加一个组
 		var gameOverText = this.gameOverGroup.create(game.width/2,0,'game_over'); //game over 文字图片
 		var scoreboard = this.gameOverGroup.create(game.width/2,70,'score_board'); //分数板
-		var currentScoreText = game.add.bitmapText(game.width/2 + 60, 105, 'flappy_font', this.score+'', 20, this.gameOverGroup); //当前分数
-		var bestScoreText = game.add.bitmapText(game.width/2 + 60, 153, 'flappy_font', game.bestScore+'', 20, this.gameOverGroup); //最高分
-
-		if(this.score > 2) 
-			var medalEPL = game.add.sprite(game.width/2-87, 142, 'medals', 0, this.medalGroup);//英超奖章
-		if(this.score > 5)
-			var medalEL = game.add.sprite(game.width/2-87, 142, 'medals', 1, this.medalGroup);//欧联杯奖章
+		var currentScoreText = game.add.bitmapText(game.width/2 + 30, 226, 'flappy_font', this.score+'', 24, this.gameOverGroup); //当前分数
+		var bestScoreText = game.add.bitmapText(game.width/2 + 30, 254, 'flappy_font', game.bestScore+'', 24, this.gameOverGroup); //最高分
 
 
-		//var medalEL = game.add.sprite(game.width, 105, 'medals', 1, this.medalGroup);//欧联杯奖章
+		if(this.score > 38) {
+			var medalEPLG = game.add.sprite(game.width/2-59, 113, 'medals', 1, this.medalGroup);//英超金奖章
+		}
+		else if (this.score > 22) {
+			var emitter = game.add.emitter(game.world.centerX,174, 100);//粒子动画
+			emitter.makeParticles('LightPraticle', [0, 1, 2, 3, 4, 5]);
+			emitter.minParticleSpeed.setTo(-100, -100);
+			emitter.maxParticleSpeed.setTo(100, 100);
+			emitter.gravity = 0;
+			emitter.start(false, 4000, 15);
+			var medalEPLS = game.add.sprite(game.width/2-59, 113, 'medals', 0, this.medalGroup);//英超银奖章
+		}
+		else if (this.score > 17) {
+			var medalFakeArsenal = game.add.sprite(game.width/2-90, 123, 'arsenal', 0, this.medalGroup);
+		}
+		else if (this.score >11) {
+			var medalMiddle = game.add.sprite(game.width/2-73, 153, 'middle', 2, this.medalGroup);	
+			medalMiddle.animations.add('middleAnime');
+			medalMiddle.animations.play('middleAnime', 3, true)		
+		}
+		else if (this.score >5) {
+			var medalKeepLevel = game.add.sprite(game.width/2-80, 153, 'stayLevel', 0, this.medalGroup);
+			medalKeepLevel.animations.add('keepLevelAnime'); //添加动画
+			medalKeepLevel.animations.play('keepLevelAnime',3,true); //播放动画
+		}
+		else{
+			var medalDegrade = game.add.sprite(game.width/2-86, 153, 'degrade', 0, this.medalGroup);
+		}
+		//game.add.tween(medalGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true);//勋章动画
 
-
-
-		
-		var replayBtn = game.add.button(game.width/2, 210, 'btn', function(){//重玩按钮
+		var replayBtn = game.add.button(game.width/2, 350, 'btn', function(){//重玩按钮
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
 		gameOverText.anchor.setTo(0.5, 0);
@@ -182,20 +226,26 @@ game.States.play = function(){
 
 	this.generatePipes = function(gap){ //制造管道
 		gap = gap || 100; //上下管道之间的间隙宽度
+
 		var position = (505 - 320 - gap) + Math.floor((505 - 112 - 30 - gap - 505 + 320 + gap) * Math.random());
 		var topPipeY = position-360;
 		var bottomPipeY = position+gap;
 
-		if(this.resetPipe(topPipeY,bottomPipeY)) return;
 
-		var topPipe = game.add.sprite(game.width, topPipeY, 'pipe', 0, this.pipeGroup);
-		var bottomPipe = game.add.sprite(game.width, bottomPipeY, 'pipe', 1, this.pipeGroup);
+		//if(this.resetPipe(topPipeY,bottomPipeY)) return;
+
+		var topPipe = game.add.sprite(game.width, topPipeY, 'topPipe_sprite', this.pipeTag % 19, this.pipeGroup);
+		var bottomPipe = game.add.sprite(game.width, bottomPipeY, 'bottomPipe_sprite', this.pipeTag % 19, this.pipeGroup);	
+		
 		this.pipeGroup.setAll('checkWorldBounds',true);
 		this.pipeGroup.setAll('outOfBoundsKill',true);
 		this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
+		this.pipeTag++;
+		
+		//if(this.pipeTag = 19) this.pipeTag = 0;
 	}
 
-	this.resetPipe = function(topPipeY,bottomPipeY){//重置出了边界的管道，做到回收利用
+	/*this.resetPipe = function(topPipeY,bottomPipeY){//重置出了边界的管道，做到回收利用
 		var i = 0;
 		this.pipeGroup.forEachDead(function(pipe){
 			if(pipe.y<=0){ //topPipe
@@ -206,11 +256,13 @@ game.States.play = function(){
 			}
 			pipe.body.velocity.x = -this.gameSpeed;
 			i++;
+
 		}, this);
 		return i == 2; //如果 i==2 代表有一组管道已经出了边界，可以回收这组管道了
-	}
+	}*/
 
-	this.checkScore = function(pipe){//负责分数的检测和更新
+	this.checkScore = function(pipe)
+	{//负责分数的检测和更新
 		if(!pipe.hasScored && pipe.y<=0 && pipe.x<=this.fox.x-17-54){
 			pipe.hasScored = true;
 			this.scoreText.text = ++this.score;
