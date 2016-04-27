@@ -154,14 +154,14 @@ game.States.play = function(){
 	this.hitGround = function(){
 		if(this.hasHitGround) return; //已经撞击过地面
 		this.hasHitGround = true;
-		this.soundHitGround.play();
+		this.soundGameOver.play();
 		this.gameOver(true);
 	}
 	this.gameOver = function(show_text){
 		this.gameIsOver = true;
 		this.stopGame();
 		if(show_text) this.showGameOverText();
-		this.soundGameOver.play();
+		//this.soundGameOver.play();
 	};
 
 	/*
@@ -185,11 +185,11 @@ game.States.play = function(){
 		var bestScoreText = game.add.bitmapText(game.width/2 + 30, 254, 'flappy_font', game.bestScore+'', 24, this.gameOverGroup); //最高分
 
 
-		if(this.score > 38) {
+		if(this.score > 88) {
 			var medalEPLG = game.add.sprite(game.width/2-59, 113, 'medals', 1, this.medalGroup);//英超金奖章
 		}
-		else if (this.score > 22) {
-			var emitter = game.add.emitter(game.world.centerX,174, 100);//粒子动画
+		else if (this.score > 38) {
+			var emitter = game.add.emitter(game.world.centerX,174, 174);//粒子动画
 			emitter.makeParticles('LightPraticle', [0, 1, 2, 3, 4, 5]);
 			emitter.minParticleSpeed.setTo(-100, -100);
 			emitter.maxParticleSpeed.setTo(100, 100);
@@ -197,15 +197,15 @@ game.States.play = function(){
 			emitter.start(false, 4000, 15);
 			var medalEPLS = game.add.sprite(game.width/2-59, 113, 'medals', 0, this.medalGroup);//英超银奖章
 		}
-		else if (this.score > 17) {
+		else if (this.score > 30) {
 			var medalFakeArsenal = game.add.sprite(game.width/2-90, 123, 'arsenal', 0, this.medalGroup);
 		}
-		else if (this.score >11) {
+		else if (this.score >20) {
 			var medalMiddle = game.add.sprite(game.width/2-73, 153, 'middle', 2, this.medalGroup);	
 			medalMiddle.animations.add('middleAnime');
 			medalMiddle.animations.play('middleAnime', 3, true)		
 		}
-		else if (this.score >5) {
+		else if (this.score >10) {
 			var medalKeepLevel = game.add.sprite(game.width/2-80, 153, 'stayLevel', 0, this.medalGroup);
 			medalKeepLevel.animations.add('keepLevelAnime'); //添加动画
 			medalKeepLevel.animations.play('keepLevelAnime',3,true); //播放动画
@@ -215,7 +215,7 @@ game.States.play = function(){
 		}
 		//game.add.tween(medalGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true);//勋章动画
 
-		var replayBtn = game.add.button(game.width/2, 350, 'btn', function(){//重玩按钮
+		var replayBtn = game.add.button(game.width/2, 320, 'btn', function(){//重玩按钮
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
 		gameOverText.anchor.setTo(0.5, 0);
