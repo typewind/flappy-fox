@@ -1,4 +1,5 @@
-var game = new Phaser.Game(320,505,Phaser.AUTO,'game'); //实例化game
+var game = new Phaser.Game(320,505,Phaser.CANVAS,'game'); //实例化game
+
 game.States = {}; //存放state对象
 
 game.States.boot = function(){
@@ -34,6 +35,7 @@ game.States.preload = function(){
     	game.load.audio('hit_pipe_sound', 'assets/pipe-hit.wav'); //撞击管道的音效
     	game.load.audio('hit_ground_sound', 'assets/ouch.wav'); //撞击地面的音效
     	game.load.audio('game_over_sound', 'assets/gameover.wav');//游戏结束音效
+    	//game.load.image('wxBtn', 'assets/wxButton.png');//微信分享按钮
     	//游戏结束成就展示
     	game.load.spritesheet('medals','assets/medals.png',119 ,119 ,2);//英超成就奖章
     	game.load.spritesheet('arsenal', 'assets/4rsenal.png', 161, 89, 1);//装枪作4
@@ -155,6 +157,7 @@ game.States.play = function(){
 		if(this.hasHitGround) return; //已经撞击过地面
 		this.hasHitGround = true;
 		this.soundGameOver.play();
+		this.soundGameOver.volume = 0.1;
 		this.gameOver(true);
 	}
 	this.gameOver = function(show_text){
@@ -183,6 +186,9 @@ game.States.play = function(){
 		var scoreboard = this.gameOverGroup.create(game.width/2,70,'score_board'); //分数板
 		var currentScoreText = game.add.bitmapText(game.width/2 + 30, 226, 'flappy_font', this.score+'', 24, this.gameOverGroup); //当前分数
 		var bestScoreText = game.add.bitmapText(game.width/2 + 30, 254, 'flappy_font', game.bestScore+'', 24, this.gameOverGroup); //最高分
+		/*var wxShareBtn = game.add.button(game.width/2-85, 480,'wxBtn',function(){//微信分享按钮
+			window.open('http://service.weibo.com/share/share.php?url=https://github.com/typewind/flappy-fox&type=button&ralateUid=1698513182&language=zh_cn&title=%E4%B8%89%E5%8D%81%E5%B9%B4%E8%8E%B1%E6%96%AF%E7%89%B9%E8%80%81%E7%90%83%E8%BF%B7&pic=http%3A%2F%2Fww1.sinaimg.cn%2Fmw690%2Fedfa6724gw1f3adh6va8kj21kw0w2dn5.jpg&searchPic=true&style=simple');
+		});*/
 
 
 		if(this.score > 88) {
@@ -215,7 +221,7 @@ game.States.play = function(){
 		}
 		//game.add.tween(medalGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true);//勋章动画
 
-		var replayBtn = game.add.button(game.width/2, 320, 'btn', function(){//重玩按钮
+		var replayBtn = game.add.button(game.width/2, 300, 'btn', function(){//重玩按钮
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
 		gameOverText.anchor.setTo(0.5, 0);
