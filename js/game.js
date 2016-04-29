@@ -9,6 +9,7 @@ game.States.boot = function(){
 			this.scale.forcePortrait = true;
 			this.scale.refresh();
 		}
+		game.stage.backgroundColor = '#064996';
 		game.load.image('loading','assets/preloader.gif');
 	};
 	this.create = function(){
@@ -37,12 +38,15 @@ game.States.preload = function(){
     	game.load.audio('game_over_sound', 'assets/gameover.wav');//游戏结束音效
     	//game.load.image('wxBtn', 'assets/wxButton.png');//微信分享按钮
     	//游戏结束成就展示
-    	game.load.spritesheet('medals','assets/medals.png',119 ,119 ,2);//英超成就奖章
+    	//game.load.spritesheet('medals','assets/medals.png',119 ,119 ,2);//英超成就奖章
     	game.load.spritesheet('arsenal', 'assets/4rsenal.png', 161, 89, 1);//装枪作4
     	game.load.spritesheet('middle', 'assets/middle.png',148, 34, 3);//中游
     	game.load.spritesheet('stayLevel', 'assets/stay.png', 161, 40, 3);//保级
+    	//game.load.spritesheet('stayLevelBack', 'assets/stay_b.png',128, 128);//保级旋转背景
     	game.load.spritesheet('degrade','assets/degrade.png', 172, 45, 1);//降级
     	game.load.spritesheet('LightPraticle', 'assets/light.png',10, 10);//黄色粒子效果
+    	game.load.spritesheet('trophyEPL', 'assets/champion.png', 234, 173);//英超冠军
+    	//game.load.spritesheet('foxTailAnime', 'assets/fox_tail.png', 60, 60);//狐狸尾巴效果
 
 
 
@@ -62,12 +66,12 @@ game.States.menu = function(){
 		game.add.tileSprite(0,game.height-112,game.width,112,'ground').autoScroll(-100,0); //地板
 		var titleGroup = game.add.group(); //创建存放标题的组
 		titleGroup.create(0,0,'title'); //标题
-		var fox = titleGroup.create(190, 10, 'fox'); //添加fox到组里
+		var fox = titleGroup.create(105, 60, 'fox'); //添加fox到组里
 		fox.animations.add('fly'); //添加动画
 		fox.animations.play('fly',12,true); //播放动画
 		titleGroup.x = 35;
-		titleGroup.y = 100;
-		game.add.tween(titleGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true); //标题的缓动动画
+		titleGroup.y = 70;
+		game.add.tween(titleGroup).to({ y:90 },1000,null,true,0,Number.MAX_VALUE,true); //标题的缓动动画
 		var btn = game.add.button(game.width/2,game.height/2,'btn',function(){//开始按钮
 			game.state.start('play');
 		});
@@ -81,7 +85,9 @@ game.States.play = function(){
 		this.pipeGroup = game.add.group();
 		this.pipeGroup.enableBody = true;
 		this.pipeTag = 0; //管道标签
-		this.ground = game.add.tileSprite(0,game.height-112,game.width,112,'ground'); //地板
+		this.ground = game.add.tileSprite(0,game.height-112,game.width,112,'ground'); //地板				
+
+			
 		this.fox = game.add.sprite(50,150,'fox'); //狐狸
 		this.fox.animations.add('fly');
 		this.fox.animations.play('fly',12,true);
@@ -99,7 +105,7 @@ game.States.play = function(){
 		this.scoreText = game.add.bitmapText(game.world.centerX-20, 30, 'flappy_font', '0', 36);
 
 		this.readyText = game.add.image(game.width/2, 40, 'ready_text'); //get ready 文字
-		this.playTip = game.add.image(game.width/2,300,'play_tip'); //提示点击
+		this.playTip = game.add.image(game.width/2,150,'play_tip'); //提示点击
 		this.readyText.anchor.setTo(0.5, 0);
 		this.playTip.anchor.setTo(0.5, 0);
 
@@ -167,15 +173,6 @@ game.States.play = function(){
 		//this.soundGameOver.play();
 	};
 
-	/*
-	this.showLightPraticle = function(){ 	//黄色发散粒子动画
-		var emitter = game.add.emitter(game.world.centerX, game.world.centerY, 250);
-		emitter.makeParticles('LightPraticle', [0, 1, 2, 3, 4, 5]);
-		emitter.minParticleSpeed.setTo(-200, -200);
-		emitter.maxParticleSpeed.setTo(200, 200);
-		emitter.gravity = 0;
-		emitter.start(false, 4000, 15);
-	}*/
 
 	this.showGameOverText = function(){
 		this.scoreText.destroy();
@@ -192,16 +189,17 @@ game.States.play = function(){
 
 
 		if(this.score > 88) {
-			var medalEPLG = game.add.sprite(game.width/2-59, 113, 'medals', 1, this.medalGroup);//英超金奖章
-		}
-		else if (this.score > 38) {
-			var emitter = game.add.emitter(game.world.centerX,174, 174);//粒子动画
+			var emitter = game.add.emitter(game.world.centerX,180, 174);//粒子动画
 			emitter.makeParticles('LightPraticle', [0, 1, 2, 3, 4, 5]);
 			emitter.minParticleSpeed.setTo(-100, -100);
 			emitter.maxParticleSpeed.setTo(100, 100);
 			emitter.gravity = 0;
 			emitter.start(false, 4000, 15);
-			var medalEPLS = game.add.sprite(game.width/2-59, 113, 'medals', 0, this.medalGroup);//英超银奖章
+			var trophyEPLP = game.add.sprite(game.width/2-117, 80, 'trophyEPL', 0, this.medalGroup);//英超奖杯
+		}
+		else if (this.score > 37) {
+	
+			var trophyEPL = game.add.sprite(game.width/2-117, 80, 'trophyEPL', 0, this.medalGroup);//英超奖杯
 		}
 		else if (this.score > 30) {
 			var medalFakeArsenal = game.add.sprite(game.width/2-90, 123, 'arsenal', 0, this.medalGroup);
@@ -212,16 +210,19 @@ game.States.play = function(){
 			medalMiddle.animations.play('middleAnime', 3, true)		
 		}
 		else if (this.score >10) {
+			//var backgroundKeepLevel = game.add.sprite(game.width/2-64, 153, 'stayLevelBack', 0, this.medalGroup);
 			var medalKeepLevel = game.add.sprite(game.width/2-80, 153, 'stayLevel', 0, this.medalGroup);
 			medalKeepLevel.animations.add('keepLevelAnime'); //添加动画
 			medalKeepLevel.animations.play('keepLevelAnime',3,true); //播放动画
+			//backgroundKeepLevel.rotation +=0.5;
+			//game.add.tween(backgroundKeepLevel).to( { angle: 45 }, 2000, Phaser.Easing.Linear.None, true);
 		}
 		else{
 			var medalDegrade = game.add.sprite(game.width/2-86, 153, 'degrade', 0, this.medalGroup);
 		}
 		//game.add.tween(medalGroup).to({ y:120 },1000,null,true,0,Number.MAX_VALUE,true);//勋章动画
 
-		var replayBtn = game.add.button(game.width/2, 300, 'btn', function(){//重玩按钮
+		var replayBtn = game.add.button(game.width/2, 330, 'btn', function(){//重玩按钮
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
 		gameOverText.anchor.setTo(0.5, 0);
@@ -248,8 +249,10 @@ game.States.play = function(){
 		this.pipeGroup.setAll('body.velocity.x', -this.gameSpeed);
 		this.pipeTag++;
 		
-		//if(this.pipeTag = 19) this.pipeTag = 0;
+
 	}
+
+	
 
 	/*this.resetPipe = function(topPipeY,bottomPipeY){//重置出了边界的管道，做到回收利用
 		var i = 0;
