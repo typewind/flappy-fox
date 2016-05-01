@@ -36,7 +36,9 @@ game.States.preload = function(){
     	game.load.audio('hit_pipe_sound', 'assets/pipe-hit.wav'); //撞击管道的音效
     	game.load.audio('hit_ground_sound', 'assets/ouch.wav'); //撞击地面的音效
     	game.load.audio('game_over_sound', 'assets/gameover.wav');//游戏结束音效
-    	//game.load.image('wxBtn', 'assets/wxButton.png');//微信分享按钮
+    	game.load.image('share_button', 'assets/share-button.png');//分享按钮
+    	//game.load.image('share_arrow', 'assets/share-arrow.png');
+    	game.load.image('share_info', 'assets/share-info.png');
     	//游戏结束成就展示
     	//game.load.spritesheet('medals','assets/medals.png',119 ,119 ,2);//英超成就奖章
     	game.load.spritesheet('arsenal', 'assets/4rsenal.png', 161, 89, 1);//装枪作4
@@ -225,11 +227,20 @@ game.States.play = function(){
 		var replayBtn = game.add.button(game.width/2, 330, 'btn', function(){//重玩按钮
 			game.state.start('play');
 		}, this, null, null, null, null, this.gameOverGroup);
+
+		
+		var shareBtn = game.add.button(game.width/2-113, 390, 'share_button', function(){//分享按钮
+			var picture = game.add.image(0, 0, 'share_info');
+			game.add.tween(picture).to( { alpha: 0 }, 3000, Phaser.Easing.Linear.None, true);
+			//game.add.tween(picture).to( { alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+		}, this, null, null, null, null, this.gameOverGroup);
 		gameOverText.anchor.setTo(0.5, 0);
 		scoreboard.anchor.setTo(0.5, 0);
 		replayBtn.anchor.setTo(0.5, 0);
 		this.gameOverGroup.y = 30;
 	}
+
+
 
 	this.generatePipes = function(gap){ //制造管道
 		gap = gap || 100; //上下管道之间的间隙宽度
